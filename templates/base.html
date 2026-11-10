@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ profile.name }} | {{ profile.title }}{% endblock %}</title>
+    <meta name="description" content="{{ profile.name }} - {{ profile.title }} from {{ profile.location }}, focused on Kubernetes and cloud-native platforms.">
+
+    <!--
+        TailwindCSS loaded from a CDN: no Node.js or build step needed.
+        You can use any Tailwind class directly in the HTML.
+        The integrity hash makes the browser refuse the file if it was tampered with.
+        Docs: https://tailwindcss.com/docs
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.5/dist/index.global.js"
+            integrity="sha384-t+qLIxS5zM/KF99/doWY+dxTsavdvgayaZt8A9ntLsUjEkiXzYl5M3Ij8zVFPL9j"
+            crossorigin="anonymous"></script>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased">
+    <main class="mx-auto max-w-3xl px-6 py-16">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="py-8 text-center text-sm text-slate-500">
+        &copy; {{ profile.name }}
+    </footer>
+</body>
+</html>

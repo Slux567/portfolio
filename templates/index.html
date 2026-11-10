@@ -1,0 +1,143 @@
+{#
+    This page "extends" base.html: it reuses the <head>, layout and footer,
+    and only fills in the "content" block.
+    {{ ... }} prints a value, {% ... %} is logic like loops and ifs.
+#}
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Intro -->
+<section>
+    <p class="text-sky-400 font-medium">{{ profile.title }} &middot; {{ profile.location }}</p>
+    <h1 class="mt-2 text-4xl font-bold text-white sm:text-5xl">{{ profile.name }}</h1>
+    <p class="mt-6 text-lg leading-relaxed text-slate-300">{{ profile.bio }}</p>
+
+    <div class="mt-8 space-y-4">
+        {% for highlight in profile.highlights %}
+            <div class="flex items-center gap-4 rounded-lg bg-sky-500/10 p-5 ring-1 ring-sky-500/30">
+                <span class="text-4xl" aria-hidden="true">{{ highlight.emoji }}</span>
+                <div>
+                    <p class="font-semibold text-sky-300">{{ highlight.title }}</p>
+                    <p class="text-sm text-slate-300">{{ highlight.text }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Skills -->
+<section class="mt-16">
+    <h2 class="text-2xl font-semibold text-white">Skills</h2>
+
+    <h3 class="mt-6 text-sm font-medium uppercase tracking-wide text-slate-400">Core skills</h3>
+    <ul class="mt-3 flex flex-wrap gap-3">
+        {% for skill in profile.core_skills %}
+            <li class="rounded-md bg-sky-500/10 px-4 py-2 text-base font-semibold text-sky-300 ring-1 ring-sky-500/30">{{ skill }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3 class="mt-6 text-sm font-medium uppercase tracking-wide text-slate-400">Skills</h3>
+    <ul class="mt-3 flex flex-wrap gap-2">
+        {% for skill in profile.skills %}
+            <li class="rounded-md bg-slate-800 px-3 py-1 text-sm">{{ skill }}</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<!-- Experience -->
+<section class="mt-16">
+    <h2 class="text-2xl font-semibold text-white">Experience</h2>
+    <div class="mt-4 space-y-4">
+        {% for job in profile.experience %}
+            <div class="rounded-lg border border-slate-800 p-5">
+                <h3 class="font-semibold text-white">{{ job.role }}</h3>
+                <p class="text-slate-400">{{ job.company }}</p>
+                <p class="mt-1 text-sm text-slate-500">{{ job.period }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Certificates (loaded from Credly in app.py) -->
+<section class="mt-16">
+    <h2 class="text-2xl font-semibold text-white">Certificates</h2>
+
+    {% if not certificates %}
+        <p class="mt-4 text-slate-400">Could not load certificates right now.</p>
+    {% endif %}
+
+    {#
+        batch(6) splits the list into groups of 6. Each group becomes one "page".
+        Only the first page is visible; the others get the "hidden" class.
+    #}
+    {% for group in certificates | batch(6) %}
+        <div class="cert-page mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 {% if not loop.first %}hidden{% endif %}">
+            {% for cert in group %}
+                <a href="{{ cert.url }}" target="_blank" rel="noopener"
+                   class="flex items-center gap-4 rounded-lg border border-slate-800 p-4 transition hover:border-sky-500">
+                    <img src="{{ cert.image }}" alt="{{ cert.name }} badge" loading="lazy" class="h-16 w-16 shrink-0">
+                    <div>
+                        <h3 class="font-semibold text-white">{{ cert.name }}</h3>
+                        <p class="text-sm text-slate-400">{{ cert.issuer }}</p>
+                        <p class="text-sm text-slate-500">{{ cert.date }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <!-- One button per page. Only shown when there is more than one page. -->
+    {% set page_count = (certificates | batch(6) | list | length) %}
+    {% if page_count > 1 %}
+        <div class="mt-4 flex gap-2">
+            {% for number in range(page_count) %}
+                <button type="button" onclick="showCertPage({{ number }})"
+                        aria-label="Show certificates page {{ number + 1 }}"
+                        class="cert-button rounded-md px-3 py-1 text-sm {% if loop.first %}bg-sky-500 text-white{% else %}bg-slate-800{% endif %}">
+                    {{ number + 1 }}
+                </button>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+
+<script>
+    // Show the chosen page of certificates and hide the others.
+    // No page reload needed, so you stay in the same spot on the page.
+    function showCertPage(number) {
+        document.querySelectorAll(".cert-page").forEach(function (page, i) {
+            page.classList.toggle("hidden", i !== number);
+        });
+        document.querySelectorAll(".cert-button").forEach(function (button, i) {
+            button.classList.toggle("bg-sky-500", i === number);
+            button.classList.toggle("text-white", i === number);
+            button.classList.toggle("bg-slate-800", i !== number);
+        });
+    }
+</script>
+
+<!-- Projects -->
+<section class="mt-16">
+    <h2 class="text-2xl font-semibold text-white">Projects</h2>
+    <div class="mt-4 space-y-4">
+        {% for project in profile.projects %}
+            <a href="{{ project.url }}" target="_blank" rel="noopener"
+               class="block rounded-lg border border-slate-800 p-5 transition hover:border-sky-500">
+                <h3 class="font-semibold text-white">{{ project.name }} &rarr;</h3>
+                <p class="mt-1 text-slate-400">{{ project.description }}</p>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Contact -->
+<section class="mt-16">
+    <h2 class="text-2xl font-semibold text-white">Contact</h2>
+    <p class="mt-4 text-slate-300">
+        Want to get in touch? Send me an email at
+        <a href="mailto:{{ profile.email }}" class="text-sky-400 underline hover:text-sky-300">{{ profile.email }}</a>.
+    </p>
+</section>
+
+{% endblock %}
