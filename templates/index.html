@@ -92,7 +92,7 @@
     {% if page_count > 1 %}
         <div class="mt-4 flex gap-2">
             {% for number in range(page_count) %}
-                <button type="button" onclick="showCertPage({{ number }})"
+                <button type="button" data-page="{{ number }}"
                         aria-label="Show certificates page {{ number + 1 }}"
                         class="cert-button rounded-md px-3 py-1 text-sm {% if loop.first %}bg-sky-500 text-white{% else %}bg-slate-800{% endif %}">
                     {{ number + 1 }}
@@ -102,20 +102,8 @@
     {% endif %}
 </section>
 
-<script>
-    // Show the chosen page of certificates and hide the others.
-    // No page reload needed, so you stay in the same spot on the page.
-    function showCertPage(number) {
-        document.querySelectorAll(".cert-page").forEach(function (page, i) {
-            page.classList.toggle("hidden", i !== number);
-        });
-        document.querySelectorAll(".cert-button").forEach(function (button, i) {
-            button.classList.toggle("bg-sky-500", i === number);
-            button.classList.toggle("text-white", i === number);
-            button.classList.toggle("bg-slate-800", i !== number);
-        });
-    }
-</script>
+<!-- The page buttons are handled in static/certificates.js -->
+<script src="{{ url_for('static', filename='certificates.js') }}" defer></script>
 
 <!-- Projects -->
 <section class="mt-16">
