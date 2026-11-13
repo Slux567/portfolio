@@ -1,0 +1,42 @@
+# The Deployment runs the container and keeps it running.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: portfolio
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          env:
+            - name: TRUSTED_PROXY_COUNT
+              value: {{ .Values.trustedProxyCount | quote }}
+          ports:
+            - name: http
+              containerPort: 8000
+          # Kubernetes calls /healthz to check if the app is alive and ready.
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          # Matches the hardening in the Dockerfile: non-root user (65532),
+          # read-only filesystem, no extra Linux privileges.
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]

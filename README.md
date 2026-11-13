@@ -77,15 +77,19 @@ localhost. For automatic reloading and error pages while developing, run
 
 ```bash
 docker build -t portfolio .
-docker run -p 8000:8000 portfolio
+docker run -p 127.0.0.1:8000:8000 portfolio
 ```
 
 Open <http://localhost:8000>. With Podman, replace `docker` with `podman`.
 
+`127.0.0.1:` makes the port only reachable from your own machine, over IPv4. The app
+listens on IPv4 only (works in every Kubernetes cluster), so without it `localhost`
+can fail on systems where it resolves to IPv6 (`::1`) first.
+
 The container also runs with a read-only filesystem and all Linux capabilities dropped:
 
 ```bash
-docker run -p 8000:8000 --read-only --cap-drop=ALL portfolio
+docker run -p 127.0.0.1:8000:8000 --read-only --cap-drop=ALL portfolio
 ```
 
 ## Configuration

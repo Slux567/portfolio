@@ -1,0 +1,27 @@
+# These are the settings you can change without touching the templates.
+# Override any of them on the command line, e.g. --set image.tag=abc1234
+
+image:
+  repository: ghcr.io/slux567/portfolio
+  # Leave empty to use the chart's appVersion (set by the pipeline from the git tag).
+  # Set it to a commit SHA to deploy a specific build instead.
+  tag: ""
+
+replicas: 1
+
+# How many proxies in front of the app add the visitor's IP to the
+# X-Forwarded-For header. The app trusts exactly this many, counted from the right.
+# Traffic path: visitor -> Cloudflare -> cloudflared (tunnel) -> Envoy -> app
+# Cloudflare and Envoy each add an IP; cloudflared passes the header on unchanged.
+# Never set this higher than the real number, or visitors can fake their IP.
+trustedProxyCount: 2
+
+# The HTTPRoute connects the site to the Envoy Gateway.
+route:
+  hostname: portfolio.sluxcloud.com
+  gateway:
+    name: external
+    namespace: envoy-gateway
+    # The listener on the Gateway to attach to. The "https" listener accepts
+    # routes from all namespaces, the "http" one only from its own namespace.
+    sectionName: https

@@ -1,15 +1,18 @@
-name: Publish image
+name: Publish
 
+# Push to main      -> image tagged with the short commit SHA
+# Push a tag v1.2.0 -> image tagged with the SHA and 1.2.0, plus Helm chart 1.2.0
 on:
   push:
     branches: [main]
+    tags: ["v*"]
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  publish:
+  image:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +23,30 @@ jobs:
       - name: Build and push
         run: |
           IMAGE=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          TAG=$(git rev-parse --short HEAD)
-          docker build -t $IMAGE:$TAG .
-          docker push $IMAGE:$TAG
+          SHA=$(git rev-parse --short HEAD)
+          docker build -t $IMAGE:$SHA .
+          docker push $IMAGE:$SHA
+
+          # On a version tag, give the same image a version tag too (v1.2.0 -> 1.2.0)
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            VERSION=${GITHUB_REF_NAME#v}
+            docker tag $IMAGE:$SHA $IMAGE:$VERSION
+            docker push $IMAGE:$VERSION
+          fi
+
+  chart:
+    # Only runs for version tags, after the image exists
+    if: github.ref_type == 'tag'
+    needs: image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package and push chart
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
+          # The git tag sets both the chart version and the app (image) version
+          helm package chart/ --version $VERSION --app-version $VERSION
+          helm push portfolio-$VERSION.tgz oci://ghcr.io/$OWNER/charts

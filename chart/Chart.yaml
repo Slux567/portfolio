@@ -1,0 +1,9 @@
+# Basic info about the chart. "version" is the version of the chart itself,
+# "appVersion" is the image tag it deploys by default.
+# The pipeline overwrites both with the git tag (v1.2.0 -> 1.2.0) when releasing.
+apiVersion: v2
+name: portfolio
+description: My Flask portfolio website
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
