@@ -32,4 +32,4 @@ EXPOSE 8000
 # --worker-tmp-dir /dev/shm: gunicorn needs a writable folder, /dev/shm is in memory
 # --access-logfile -: log every request to stdout
 # --no-control-socket: turn off gunicorn's admin socket, we don't use it
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--worker-tmp-dir", "/dev/shm", "--access-logfile", "-", "--no-control-socket", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--threads", "4", "--worker-tmp-dir", "/dev/shm", "--access-logfile", "-", "--no-control-socket", "app:app"]
