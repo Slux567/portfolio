@@ -13,6 +13,10 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: portfolio
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -22,7 +26,8 @@ spec:
           ports:
             - name: http
               containerPort: 8000
-          # Kubernetes calls /healthz to check if the app is alive and ready.
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -31,8 +36,6 @@ spec:
             httpGet:
               path: /healthz
               port: http
-          # Matches the hardening in the Dockerfile: non-root user (65532),
-          # read-only filesystem, no extra Linux privileges.
           securityContext:
             runAsNonRoot: true
             runAsUser: 65532
