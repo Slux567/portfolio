@@ -22,7 +22,7 @@ It runs on my own Kubernetes cluster at home, deployed with Flux from my
   hour. If Credly is unreachable, the last known certificates stay on the page.
 - **No frontend build step:** Tailwind CSS is loaded from a CDN, pinned to an exact version
   with an integrity hash.
-- **Container-ready:** a small Docker image that runs gunicorn as a non-root user and works
+- **Container-ready:** a small distroless image that runs gunicorn as a non-root user and works
   with a read-only filesystem.
 - **Secure by default:** see [Security](#security).
 
@@ -114,7 +114,9 @@ probes.
   headers, but only when `TRUSTED_PROXY_COUNT` is set.
 - **Supply chain:** all Python dependencies (including indirect ones) are pinned with hashes,
   the base image is pinned by digest, and Tailwind is loaded with an integrity hash.
-- **Container:** runs as non-root user `10001`, contains only the files the app needs, and
+- **Distroless image:** the final image contains only Python and the app. There's no shell,
+  package manager or pip, so there's far less to attack.
+- **Container:** runs as non-root user `65532`, contains only the files the app needs, and
   supports a read-only filesystem.
 
 ## Updating the content
