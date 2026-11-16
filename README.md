@@ -14,12 +14,14 @@ It runs on my own Kubernetes cluster at home, deployed with Flux from my
 
 ## Features
 
-- **Single page:** intro, highlights, skills, experience, certificates, projects and contact.
+- **Single page:** intro, skills, experience, certificates, projects and contact.
 - **Content in one place:** everything on the page comes from the `PROFILE` dictionary in `app.py`.
 - **Certificates from Credly:** badges are fetched from my public
   [Credly profile](https://www.credly.com/users/stijn-luijkx), so new certificates show up
   automatically. The result is cached for an hour, so Credly gets at most one request per
   hour. If Credly is unreachable, the last known certificates stay on the page.
+- **Scroll animations:** each section fades in as you scroll to it, and the intro fades away
+  as you scroll past it. Visitors who turned on "reduce motion" in their OS get no animations.
 - **No frontend build step:** Tailwind CSS is loaded from a CDN, pinned to an exact version
   with an integrity hash.
 - **Container-ready:** a small distroless image that runs gunicorn as a non-root user and works
@@ -42,10 +44,13 @@ It runs on my own Kubernetes cluster at home, deployed with Flux from my
 .
 ├── app.py              # Flask app, settings, page content (PROFILE) and Credly integration
 ├── templates/
-│   ├── base.html       # Shared layout: <head>, Tailwind, footer
+│   ├── base.html       # Shared layout: <head>, Tailwind, navigation, footer, animation CSS
 │   └── index.html      # The page itself
 ├── static/
-│   └── certificates.js # Switching between certificate pages
+│   ├── certificates.js # Switching between certificate pages
+│   ├── reveal.js       # Fade-in animations on scroll
+│   ├── profile.jpg     # Profile picture
+│   └── logos/          # Company logos for the Experience section
 ├── requirements.in     # Direct Python dependencies (edit this one)
 ├── requirements.txt    # All dependencies, pinned with hashes (generated)
 └── Dockerfile          # Container image
@@ -111,7 +116,7 @@ probes.
 
 - **Debug mode is off** unless explicitly enabled.
 - **Security headers** on every response: a strict Content Security Policy (scripts only from
-  this site and the pinned Tailwind file, images only from Credly), HSTS,
+  this site and the pinned Tailwind file, images only from this site and Credly), HSTS,
   `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`
   and `Cross-Origin-Opener-Policy`.
 - **Reverse proxy support:** `ProxyFix` uses the client IP and protocol from `X-Forwarded-*`

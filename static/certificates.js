@@ -8,9 +8,10 @@ function showCertPage(number) {
         page.classList.toggle("hidden", i !== number);
     });
     document.querySelectorAll(".cert-button").forEach(function (button, i) {
-        button.classList.toggle("bg-sky-500", i === number);
-        button.classList.toggle("text-white", i === number);
-        button.classList.toggle("bg-slate-800", i !== number);
+        button.classList.toggle("bg-white", i === number);
+        button.classList.toggle("text-black", i === number);
+        button.classList.toggle("bg-neutral-800", i !== number);
+        button.classList.toggle("text-neutral-300", i !== number);
     });
 }
 

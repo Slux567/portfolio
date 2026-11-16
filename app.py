@@ -55,19 +55,6 @@ PROFILE = {
         "reliable, secure, and easy to operate. Always learning, and excited to "
         "keep growing."
     ),
-    # Special titles/achievements shown at the top of the page.
-    "highlights": [
-        {
-            "emoji": "🚀",
-            "title": "Kubestronaut",
-            "text": "Holds all five CNCF Kubernetes certifications: CKA, CKAD, CKS, KCNA and KCSA.",
-        },
-        {
-            "emoji": "🏠",
-            "title": "Homelab Enthusiast",
-            "text": "Runs a Kubernetes cluster at home (and you are currently being served by it).",
-        },
-    ],
     # Shown bigger at the top of the Skills section.
     "core_skills": [
         "Kubernetes",
@@ -105,11 +92,19 @@ PROFILE = {
         "Renovate",
         "Bash",
     ],
+    # "logo" is a file in static/logos/.
     "experience": [
         {
-            "role": "Cloud Engineer",
+            "role": "Cloud/DevOps Engineer",
             "company": "KPN Developer Portal",
-            "period": "January 2024 - Present",
+            "period": "January 2025 - Present",
+            "logo": "kpn.svg",
+        },
+        {
+            "role": "AWS Cloud Engineer",
+            "company": "Sogeti",
+            "period": "February 2024 - Present",
+            "logo": "sogeti.svg",
         },
     ],
     "projects": [
@@ -195,7 +190,7 @@ def add_security_headers(response):
         "default-src 'none'",
         f"script-src 'self' {TAILWIND_URL}",
         "style-src 'unsafe-inline'",
-        "img-src https://images.credly.com",
+        "img-src 'self' https://images.credly.com",
         "base-uri 'none'",
         "form-action 'none'",
         "frame-ancestors 'none'",
