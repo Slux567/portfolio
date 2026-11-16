@@ -1,4 +1,4 @@
-# The HTTPRoute tells the Gateway: send traffic for this hostname to our Service.
+# The HTTPRoute tells the Gateway: send traffic for these hostnames to our Service.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -9,7 +9,7 @@ spec:
       namespace: {{ .Values.route.gateway.namespace }}
       sectionName: {{ .Values.route.gateway.sectionName }}
   hostnames:
-    - {{ .Values.route.hostname }}
+    {{- toYaml .Values.route.hostnames | nindent 4 }}
   rules:
     - backendRefs:
         - name: {{ .Release.Name }}
