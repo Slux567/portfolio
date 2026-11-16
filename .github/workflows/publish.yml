@@ -1,10 +1,9 @@
 name: Publish
 
-# Push to main      -> image tagged with the short commit SHA
-# Push a tag v1.2.0 -> image tagged with the SHA and 1.2.0, plus Helm chart 1.2.0
+# Only runs when a version tag is pushed (e.g. v1.2.0):
+# image tagged with the short commit SHA and 1.2.0, plus Helm chart 1.2.0
 on:
   push:
-    branches: [main]
     tags: ["v*"]
 
 permissions:
@@ -24,19 +23,13 @@ jobs:
         run: |
           IMAGE=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           SHA=$(git rev-parse --short HEAD)
-          docker build -t $IMAGE:$SHA .
+          VERSION=${GITHUB_REF_NAME#v}   # v1.2.0 -> 1.2.0
+          docker build -t $IMAGE:$SHA -t $IMAGE:$VERSION .
           docker push $IMAGE:$SHA
-
-          # On a version tag, give the same image a version tag too (v1.2.0 -> 1.2.0)
-          if [ "${{ github.ref_type }}" = "tag" ]; then
-            VERSION=${GITHUB_REF_NAME#v}
-            docker tag $IMAGE:$SHA $IMAGE:$VERSION
-            docker push $IMAGE:$VERSION
-          fi
+          docker push $IMAGE:$VERSION
 
   chart:
-    # Only runs for version tags, after the image exists
-    if: github.ref_type == 'tag'
+    # Runs after the image exists
     needs: image
     runs-on: ubuntu-latest
     steps:
