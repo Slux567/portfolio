@@ -18,7 +18,7 @@ trustedProxyCount: 2
 
 route:
   hostnames:
-    - portfolio.sluxcloud.com
+    - stijnluijkx.com
   gateway:
     name: external
     namespace: envoy-gateway
